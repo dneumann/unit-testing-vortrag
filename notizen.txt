@@ -1,0 +1,120 @@
+Ich möchte im Vortrag vor Allem den Zusammenhang zwischen Testbarkeit und Wartbarkeit betonen. Ich habe mir dazu einige Techniken angeeignet, die mir helfen, den Code testbarer und wartbarer zu machen.
+
+1
+- drei Abschnitte gegliedert
+- warum überhaupt testen?
+- welche Vorteile oder auch Nachteile hat man dadurch?
+- gehe ich auf Techniken, best practices ein, die ich bei Unit Tests anwende
+- als Letztes kommt ein kleiner Ausblick auf andere Testarten
+
+3
+- zunächst eine Art Motivation
+- bei umfangreichem, schwer verständlichem Code
+- 
+- alter Bug, der wieder auftaucht
+- 
+
+4
+- zu einem sprichwörtlichen Fass ohne Boden werden
+
+5
+- wir haben etwas, was ich hier Änderungsproblem nenne
+- werden Anforderungen definiert
+- in der Realität sieht es aber leider meistens nicht so aus
+- unsere User möchten Änderungen
+- es werden Bugs gefunden
+- die Standards ändern sich, was auch immer
+- das bedeutet für uns
+
+6
+- meine Behauptung ist, dass dieses Problem wenn nicht gelöst, aber zumindest stark entschärft wird durch AT
+- wenn der Code nämlich leicht zu testen ist, ist er auch leicht zu warten und zu ändern
+
+7
+- d. h. es funktioniert zum Zeitpunkt, an dem ich es erstelle
+-
+- da, wo man keine Veränderungen hat
+- ich dachte immer, das wäre der einzige Grund
+
+8
+- man verliert die Angst vor Änderungen und Refactorings
+- 
+- alter Bug wird sofort vom Test gemeldet
+- in diesem Zusammenhang denke ich nicht von Testen, sondern lieber von Sicherstellen (pinpoint)
+- ich will, dass mein Programm das und das tut, und zwar auch nach komplexen Refactorings
+- für mich ein zentraler Punkt, den ich hier vermitteln möchte
+- bei Tests geht es um eine Art Investition in die Zukunft
+
+9
+- eher ein subjektives Ziel
+- 
+- also lernt man, einfachere Lösungen zu finden
+-
+- viel experimentieren
+
+10
+- und Programmierstil anpassen
+
+11
+- für zB Testing-Frameworks
+-
+- genau wie der Produktivcode selbst
+
+12
+- Programmieren ohne Testen ist für mich Masochismus
+
+14
+- zunächst eine grobe Übersicht über die Testarten
+- Unit Tests sind gedacht für einzelne Klassen, es können in einem Projekt Hunderte oder Tausende erstellt werden
+- deswegen die Grundlage der Pyramide
+- darum geht es in diesem Vortrag
+- Integration Tests testen das Zusammenspiel zwischen mehreren Klassen
+- un User Tests testen das komplette System mit zB der Benutzeroberfläche und DB, üblicherweise einige Dutzend Tests
+
+15
+- Minimalbeispiel für eine Klasse, die man testen kann
+- trim()-Methode entfernt Leerzeichen am Anfang und am Ende des Strings
+- sut: Konvention, um das getestete Objekt zu erkennen
+- assertEquals(): Junit-Methode, die bei Ungleichheit einen Fehler meldet
+- 
+- Ziel 1: System funktioniert jetzt ist offensichtlich
+- wenn ein neuer Entwickler kommt -> löscht trim()
+
+17
+- man könnte zB so implementieren
+- Produktivcode: normaler Code im Unterschied zum Testcode
+- ein Problem mit Testbarkeit
+
+18
+- links: kein Unit Test möglich, rechts: Unit Test möglich
+- wie der Unit Test aussieht, werde ich gleich zeigen
+
+19
+- starten nicht mehr den Service, sondern einen Service Mock
+
+20
+- sieht trivial aus, aber stell euch if-Abfragen und Schleifen vor
+- bei komplexeren Klassen ist das Vorgehen das gleiche
+- das ist die erste "best practice", die das Vorgehen bei Unit Tests veranschaulicht
+- wie entkopple ich Klassen voneinander und teste sie unabhängig?
+
+21
+- angenommen, der Service kann das aktuelle Jahr zurückgeben
+- dann kann man dem Service Mock sagen, was er stattdessen zurückgeben soll
+- ob mein Programm das Jahr-3000-Problem hat
+- wie reagiert der Client, wenn der Service eine bestimmte Exception wirft
+
+22
+- gehe kurz auf die anderen best practices ein, die ich auch gern benutze
+- jede hat Vor- und Nachteile, die man schnell herausfindet, wenn man die selbst ausprobiert
+- 
+
+26
+- bei mehreren Klassen wird es unübersichtlich
+
+
+
+
+
+
+

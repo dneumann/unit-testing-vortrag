@@ -1,0 +1,358 @@
+
+Warum sollte ein Entwickler Unit Tests für seinen Code erstellen? Lohnt sich der Aufwand oder ist das nur Zeitverschwendung? Im Vortrag erfahrt Ihr die Antworten und lernt einfache Techniken kennen, wie man seinen Code _testbarer_ und dadurch _wartbarer_ machen kann.
+
+
+Wozu testen?
+Meine "best practices" bei Unit Tests
+Ausblick: weitere Testarten
+
+Typische Gedanken bei umfangreichem Code:
+
+Ich will die Methode nicht anfassen, dann geht bestimmt etwas kaputt. (-> Refactoring)
+Ich habe nur ein kleines Feature hinzugefügt, wieso ist jetzt diese komplett andere Stelle kaputt? (-> neuer Bug)
+Diesen Bug habe ich doch schon vor zwei Wochen gefixt, wieso ist der wieder da? (-> alter Bug)
+Wenn ich einen Bug fixe, tauchen jedesmal zwei neue auf. (-> neue Bugs)
+
+-> je größer das Programm wird, desto öfter kommt es zu so etwas
+-> Wartung und Debugging kann zu einem "Fass ohne Boden" werden
+
+Das Problem:
+
+    Ideale Welt: 
+Anforderungen
+Implementieren
+Nutzen
+
+    Realität: 
+Anforderungen
+Implementieren
+while (true) { 
+  Nutzen
+  Verändern 
+}
+
+-> Wir müssen darauf vorbereitet sein, dass ständig Änderungen und Erweiterungen gewünscht werden
+
+- Ziele beim Testen:
+  - 1. System funktioniert jetzt
+    - Flüchtigkeitsfehler sofort erkennen
+    -> Verhindern von neuen Bugs von Anfang an
+    - wäre in der "idealen Welt" ausreichend
+  - 2. System wird in Zukunft funktionieren
+    - imo DER Grund für Testen
+    - Änderungen und Refactorings ohne Angst: Sicherheitsnetz
+    -> man wird mutiger bei Änderungen
+    - sofortiges Feedback bei neuen Bugs
+    -> "Zum Glück hab ich diesen Test"
+    - für jeden gefundenen Bug einen Test schreiben, der den Bug auslöst
+    -> alte Bugs kommen nicht wieder
+    - statt "testen" besser "sicherstellen"
+  - 3. Man wird ein besserer Entwickler
+    - subjektives Ziel
+    - leicht zu testender Code ist automatisch einfacher und leichter wartbar
+    - man kann seinen Code immer weiter verbessern durch Refactorings
+- Voraussetzungen für gute Tests: 
+    - man muss auf Testbarkeit hin programmieren
+      -> man muss sich umstellen
+    - bereits Programmiertes ist meistens "verloren", da untestbar
+- Nachteile
+  - Lernaufwand
+  - Mehraufwand für Erstellen von Tests
+  - Tests müssen auch ständig geändert und erweitert werden
+
+
+Zwischenfazit:
+-> automatisiertes Testen macht uns das (Entwickler-)Leben leichter
+   ABER 
+-> erst nach einer Verzögerung, spätestens wenn Änderungswünsche kommen
+-> man kann test-süchtig werden!
+
+Übersicht: (Pyramide)
+Unit Tests (für einzelne Klassen)
+Integrationstests (für mehrere Klassen)
+Benutzertests (für das komplette System)
+
+
+Unit Tests
+
+Warnung: Beispiele sind sehr trivial, es geht um das Vorgehen!
+
+
+Eine Klasse ohne Abhängigkeiten:
+
+public class Person {
+
+  private String name;
+
+  public void setName(String newName) {
+    name = newName.trim();
+  }
+
+  public String getName() {
+    return name;
+  }
+
+}
+
+@Test
+public void shouldRemoveWhitespace() {
+  Person personSut = new Person();
+  personSut.setName(" Alex ");
+  String storedName = personSut.getName();
+
+  assertEquals("Alex", storedName);
+}
+
+- benutzt keine anderen (selbstgeschriebenen) Klassen
+- nur eine Zustandsüberprüfung
+- Ziel 2: System wird in Zukunft funktionieren
+   -> wenn trim() gelöscht wird, scheitert der Test
+
+
+
+komplexeres Beispiel mit zwei Klassen
+
+Grafik: (Client) -(start)-> (Service)
+
+Clientcode v1
+public class Client {
+
+  public void useService() {
+    Service srv = new Service();
+    srv.sendMessage("start");
+    //...
+  }
+
+}
+
+  //Aufruf im Produktivcode:
+  Client c = new Client();
+  c.useService();
+
+-> Client kann nicht isoliert getestet werden, es wird immer ein Service als lokale Variable miterzeugt
+- Ziel bei Unit Tests: Testen einzelner Klassen unabhängig von anderen.
+
+- Warum unabhängig?
+1. Gemeinsames Testen nicht immer möglich
+	- der Service läuft nicht immer oder ist noch nicht implementiert
+2. Leichte Fehlerlokalisierung 
+	- wenn ein Test fehlschlägt, weiß man genau in welcher Klasse der Fehler ist
+3. Performance
+	- Jede Klasse wird nur einmal getestet
+        - ALLE Unit Tests sind auf Knopfdruck wiederholbar
+	-> man kann alle Unit Tests sehr häufig ausführen, z. B. nach jeder Änderung, jedem Bugfix oder Refactoring
+4. Tests sind automatisch die aktuellste Dokumentation für andere Entwickler
+        - leichtere Einarbeitung in den Produktivcode
+5. Nebeneffekt: besseres Design durch lose Kopplung
+
+
+Verhindern von "new" in Methode:
+
+- Klasse von oben links
+- rechts:
+public class Client {
+
+  private Service srv = new Service();
+
+  // for unit tests
+  void setService(Service newSrv) {
+    srv = newSrv;
+  }
+
+  public void useService() {
+    srv.sendMessage("start");
+    //...
+  }
+
+}
+im Produktivcode:
+  ...
+  Client c = new Client();
+  c.useService();
+  ...
+
+- kein "new" in Methode
+- Service kann im Test ersetzt werden (durch einen Mock), da eine Instanzvariable
+- man muss ein bisschen "tricksen", damit der Code testbar wird
+
+Was können wir "testen", bzw. "sicherstellen"?
+- wenn useService() aufgerufen wird, dann muss die Nachricht "start" gesendet werden
+-> Ziel 2: System wird in Zukunft funktionieren
+  - Wenn jemand die Nachricht zu "startService" ändert, wird der Test scheitern
+
+Mock: Ersatz für ein Objekt (to mock = nachahmen).
+
+Grafik: (Client) -(start) -x-> (Service)
+                         |-> (ServiceMock)
+
+Java-Framework zum Erstellen von Mocks: Mockito
+
+@Test
+public void shouldSendStartMessage() {
+  // wie Produktivcode
+  Client clientSut = new Client();
+  // echten Service ersetzen
+  Service serviceMock = mock(Service.class);
+  clientSut.setService(serviceMock);
+
+  // wie Produktivcode
+  clientSut.useService();
+
+  // der eigentliche Test, "Sicherstellen"
+  verify(serviceMock).sendMessage("start");
+}
+
+
+Man hat Macht über den Mock, z. B.:
+1. Prüfen, welche Methoden im Test aufgerufen wurden -> verify(serviceMock).sendMessage("start")
+2. Beliebige Werte zurückgeben -> when(serviceMock.getCurrentYear()).thenReturn(3000)
+3. Beliebige Exceptions werfen -> when(serviceMock.sendMessage("start")).thenThrow(new ServiceIsRunningException())
+
+Wie kriegt man einen Mock in die zu testende Klasse hinein?
+- Setter-Methode für Tests (check)
+- Konstruktor für Tests
+- Fabrikmethode
+- Objektfabrik
+- direkte Übergabe an die Methode als Parameter
+
+-> Muss man je nach Anwendungsfall auswählen
+mehr Infos: howitest.wordpress.com
+
+links: Original
+- Konstruktor für Tests
+public class Client {
+
+  private Service srv;
+
+  public Client() {
+    srv = new Service();
+  }
+
+  // for unit tests
+  Client(Service testSrv) {
+    srv = testSrv;
+  }
+
+  public void useService() {
+    srv.sendMessage("start");
+    //...
+  }
+
+}
+im Produktivcode:
+  ...
+  Client c = new Client();
+  c.useService();
+  ...
+
+- Fabrikmethode
+links: Original
+public class Client {
+
+  // keine Instanzvariable!
+
+  // for unit tests
+  Service createService() {
+    return new Service();
+  }
+
+  public void useService() {
+    Service srv = createService();
+    srv.sendMessage("start");
+    //...
+  }
+
+}
+im Produktivcode:
+  ...
+  Client c = new Client();
+  c.useService();
+  ...
+
+  + Thread-sicher, kein Feld nötig, zB bei Web Service, Servlet
+  + auch für nicht-default Konstruktor des Service
+  - schwerer verständliches Testen mit spy()
+
+
+- Objektfabrik/Provider
+links: Original
+public class Client {
+
+  private Provider serviceProvider = new Provider();
+
+  // for unit tests
+  void setProvider(Provider newProvider) {
+    serviceProvider = newProvider;
+  }
+
+  public void useService() {
+    Service srv = serviceProvider.getService("local");
+    srv.sendMessage("start");
+    //...
+  }
+
+}
+im Produktivcode:
+  ...
+  Client c = new Client();
+  c.useService();
+  ...
+
++ flexibel
+- zwei Mocks im Test nötig: providerMock, serviceMock
+
+- direkte Übergabe
+links: Original
+public class Client {
+
+  public void useService(Service srv) {
+    srv.sendMessage("start");
+    //...
+  }
+
+}
+
+  //Aufruf im Produktivcode:
+  Client c = new Client();
+  c.useService(new Service());
+
++ Client-Code einfacher
+- API komplexer
+
+
+Hinweise für bessere Testbarkeit:
+- kein "new MyClass()" in Methoden
+- Konstruktor idealerweise ohne Parameter und ohne Logik
+- so wenig static/global/singletons wie möglich
+
+public static void main(String[] args) {
+	new Main().execute(args);
+}
+
+void execute(String[] args) {
+	...
+}
+
+  Ausnahme: kleine Utility-Methoden, die nur in-memory arbeiten
+
+- Zugriffe auf Dateien und Netzwerk: in eigene Klassen auslagern
+-> nicht einfach new FileInputStream("config.txt")
+
+MyClass ---> FileAccess
+             - InputStream readFile()
+             - void writeFile()
+
+ InputStream config = new ByteArrayInputStream("user = admin".getBytes());
+ when(fileAccessMock.readFile()).thenReturn(config);
+
+- keine "train wrecks": getServiceLocator().getService().getDescription().asXml()
+-> viele Mocks nötig
+
+Fazit: Wenn man erstmal "drin" ist, will man nicht mehr zurück zum "normalen" Programmieren.
+
+Ausblick:
+- noch wenig bis keine Erfahrung bei GUI, Web, Datenbanken
+- Integration Tests mit Spring -> Einschleusen von Mocks durch Dependency Injection
+- User Tests z. B. mit Selenium
+
+

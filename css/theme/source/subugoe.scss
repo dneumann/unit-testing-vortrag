@@ -1,0 +1,154 @@
+/**
+ * SUBUGOE theme for reveal.js.
+ */
+
+// Default mixins and settings
+@import "../template/mixins";
+
+// Background of the presentation
+$backgroundColor: #fff;
+
+// Primary/body text
+$mainFont: 'Open Sans', sans-serif;
+$mainFontSize: 36px;
+$mainColor: #000;
+
+// Headings
+$headingMargin: 0 0 24px 0;
+$headingFont: 'League Gothic', sans-serif;
+$headingColor: #1A3771;
+$headingLineHeight: 1;
+$headingLetterSpacing: 0.02em;
+$headingTextTransform: uppercase;
+$headingTextShadow: none;
+$heading1TextShadow: $headingTextShadow;
+
+// Links and actions
+$linkColor: #1A3771;
+$linkColorHover: $linkColor;
+
+// Text selection
+$selectionBackgroundColor: #1A3771;
+$selectionColor: #fff;
+
+// Include theme-specific fonts
+@font-face {
+	font-family: 'Open Sans';
+	src: url('font/OpenSans-Regular-webfont.eot');
+	src: url('font/OpenSans-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+		url('font/OpenSans-Regular-webfont.woff') format('woff'),
+		url('font/OpenSans-Regular-webfont.ttf') format('truetype'),
+		url('font/OpenSans-Regular-webfont.svg#open_sansitalic') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'Open Sans';
+	src: url('font/OpenSans-Italic-webfont.eot');
+	src: url('font/OpenSans-Italic-webfont.eot?#iefix') format('embedded-opentype'),
+		url('font/OpenSans-Italic-webfont.woff') format('woff'),
+		url('font/OpenSans-Italic-webfont.ttf') format('truetype'),
+		url('font/OpenSans-Italic-webfont.svg#open_sansitalic') format('svg');
+	font-weight: normal;
+	font-style: italic;
+}
+@font-face {
+	font-family: 'Open Sans';
+	src: url('font/OpenSans-Bold-webfont.eot');
+	src: url('font/OpenSans-Bold-webfont.eot?#iefix') format('embedded-opentype'),
+		url('font/OpenSans-Bold-webfont.woff') format('woff'),
+		url('font/OpenSans-Bold-webfont.ttf') format('truetype'),
+		url('font/OpenSans-Bold-webfont.svg#open_sansitalic') format('svg');
+	font-weight: bold;
+	font-style: normal;
+}
+// Include theme-specific fonts
+@font-face {
+	font-family: 'League Gothic';
+	src: url('font/league_gothic-webfont.eot');
+	src: url('font/league_gothic-webfont.eot?#iefix') format('embedded-opentype'),
+		 url('font/league_gothic-webfont.woff') format('woff'),
+		 url('font/league_gothic-webfont.ttf') format('truetype'),
+		 url('font/league_gothic-webfont.svg#LeagueGothicRegular') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+// Background generator
+@mixin bodyBackground() {
+	//@include radial-gradient( rgba(#000,.1), rgba(#000,0) );
+}
+
+// Theme template
+@import "../template/theme";
+
+.reveal {
+	a:not(.image) {
+		border-bottom: .1em solid lighten( desaturate($linkColor, 100), 50 );
+		&:hover {
+			border-bottom: .1em solid $linkColorHover;
+		}
+	}
+	blockquote {
+		background: rgba(#000, .1);
+		margin-bottom: 24px;
+		padding: 12px;
+		width: auto;
+	}
+	code {
+		position: relative;
+		top: -32px;
+	}
+	h1, h2 {
+		text-shadow: -6px -6px #fff, 0 -6px #fff, 6px -6px #fff, -6px 0 #fff, 6px 0 #fff, -6px 6px #fff, 0 6px #fff, 6px 6px #fff;
+	}
+	p {
+		line-height: 1.5;
+		margin-bottom: 36px;
+	}
+	pre {
+		box-shadow: none;
+		code {
+			background: none;
+			max-height: none;
+			padding: 0;
+		}
+	}
+	section {
+		img {
+			border: none;
+			box-shadow: none;
+		}
+		h2 img {
+			max-width: 320px;
+		}
+	}
+	small {
+		line-height: inherit;
+	}
+	.cols > div {
+		float: left;
+		width: 50%;
+		+ div {
+			background: #222;
+			margin: -9999px -9999px -9999px 0;
+			padding: 9999px 9999px 9999px 0;
+			h1, h2, h3, p, ol, ul, pre, small, code {
+				color: #fff;
+			}
+		}
+	}
+	.align-left {
+		text-align: left;
+	}
+	.marked {
+		background: rgba(#ff0, .5);
+	}
+	.progress {
+		height: 6px;
+	}
+}
+
+// Highlight.js themes
+@import "highlight.js/tomorrow";
+@import "highlight.js/tomorrow-night";
